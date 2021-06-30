@@ -36,7 +36,8 @@ var __={
             if (xhr.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4          
                 cb(xhr.responseText, xhr.status);
             }
-        };        
+        };   
+        
         xhr.open("GET", url+((window.location.queryString("cachebuster")!==null) ? "?cachebuster="+__.rndString(10,["letters","numbers"]) : ""), true);
         xhr.send();
     },
@@ -55,7 +56,7 @@ var __={
 
             files.forEach(function(file){
                 if(__.loaded.indexOf(file)===-1){
-                    __.getScript(window.location.origin+file+((__.config.use_min) ? __.config.use_min : "")+".js", function(){
+                    __.getScript(((typeof __.config!=="undefined" && typeof __.config.origin!=="undefined" ) ? __.config.origin : window.location.origin)+file+((__.config.use_min) ? __.config.use_min : "")+".js", function(){
                         __.loaded.push(file);
                         loading--;
                         if(loading<=0){
@@ -144,8 +145,8 @@ var __={
                         routeRegex+='\\/'+p;
                     }                    
                 });
-
-                if(RegExp(routeRegex).test(location) && (location.substr(1).split("/").length <= routeParts.length)){                    
+                
+                if(RegExp(routeRegex).test(location) ){  // && (location.substr(1).split("/").length <= routeParts.length)                    
                     window.location.search.substr(1).split("&").forEach(function(qs){                          
                         if(qs && qs.indexOf("=")>0){                            
                             parameters[qs.split("=")[0]]=qs.split("=")[1];
@@ -179,9 +180,9 @@ var __={
     ******************************************** */
     renderScreen:function(screenId, p={}){
         __.params = p;
-        __.getContent(window.location.origin+"/screens/"+screenId+"/"+"ui"+((__.config.use_min) ? __.config.use_min : "")+".html", (html)=>{
-            document.getElementById("screen").innerHTML = html;
-            __.getScript(window.location.origin+"/screens/"+screenId+"/"+"logic"+((__.config.use_min) ? __.config.use_min : "")+".js");
+        __.getContent(((typeof __.config!=="undefined" && typeof __.config.origin!=="undefined" ) ? __.config.origin : window.location.origin)+"/screens/"+screenId+"/"+"ui"+((__.config.use_min) ? __.config.use_min : "")+".html", (html)=>{
+            document.getElementById(((typeof __.config.screenDOMId!=="undefined") ? __.config.screenDOMId : "screen")).innerHTML = html;
+            __.getScript(((typeof __.config!=="undefined" && typeof __.config.origin!=="undefined" ) ? __.config.origin : window.location.origin)+"/screens/"+screenId+"/"+"logic"+((__.config.use_min) ? __.config.use_min : "")+".js");
         });
     },
 
@@ -206,17 +207,17 @@ var __={
         var componentId=((typeof component==="string") ? component : component[0]);
         
         this.components[componentId]={"data":params};
-        this.getContent(window.location.origin+"/components/"+componentId.toLowerCase()+"/ui"+((__.config.use_min) ? __.config.use_min : "")+".html", function(html){
+        this.getContent(((typeof __.config!=="undefined" && typeof __.config.origin!=="undefined" ) ? __.config.origin : window.location.origin)+"/components/"+componentId.toLowerCase()+"/ui"+((__.config.use_min) ? __.config.use_min : "")+".html", function(html){
             
             if(document.getElementById(componentId+"ComponentHolder")){
                 document.getElementById(componentId+"ComponentHolder").innerHTML = html;
             }else if(document.getElementById(component[1]+"ComponentHolder")){
                 document.getElementById(component[1]+"ComponentHolder").innerHTML = html;
             }else{
-                document.getElementById("screen").innerHTML =  document.getElementById("screen").innerHTML + html;
+                document.getElementById(((typeof __.config.screenDOMId!=="undefined") ? __.config.screenDOMId : "screen")).innerHTML =  document.getElementById(((typeof __.config.screenDOMId!=="undefined") ? __.config.screenDOMId : "screen")).innerHTML + html;
             }
 
-            that.getScript(window.location.origin+"/components/"+componentId.toLowerCase()+"/logic"+((__.config.use_min) ? __.config.use_min : "")+".js", function(){                 
+            that.getScript(((typeof __.config!=="undefined" && typeof __.config.origin!=="undefined" ) ? __.config.origin : window.location.origin)+"/components/"+componentId.toLowerCase()+"/logic"+((__.config.use_min) ? __.config.use_min : "")+".js", function(){                 
                 if(cb){                                    
                     if(typeof __.components[componentId.toLowerCase()].js!=="undefined" && typeof __.components[componentId.toLowerCase()].js.callback!=="undefined"){                        
                         __.components[componentId.toLowerCase()].js.callback=cb;                        
@@ -477,7 +478,7 @@ var __={
             },
             screen:function(hide){
                 this.dim(hide);
-                this.section("screen",hide);                
+                this.section(((typeof __.config.screenDOMId!=="undefined") ? __.config.screenDOMId : "screen"),hide);                
             },
             button:function(id, hide){
                 if(document.getElementById(id)){
