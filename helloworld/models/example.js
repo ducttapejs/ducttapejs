@@ -1,0 +1,1 @@
+__.models.example={};
