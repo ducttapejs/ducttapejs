@@ -15,6 +15,7 @@ The main DucttapeJS object is accessed with the double underscore __.
 
 Below is a list of the available methods.
 
+
 ---------------
 
 ### Loading, Getting & Including scripts and data
@@ -26,6 +27,8 @@ __.getContent(url, cb)
 __.callAPI(url, params)
 
 __.load(files, cb, reload)
+
+__.loadComponent(componentPath, domId, params, cb)
 
 __.shared(obj)
 
