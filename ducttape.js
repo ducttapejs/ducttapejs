@@ -1,4 +1,4 @@
-/*v012023.4*/
+/*v012023.5*/
 
 var __ = {
   config: {},
@@ -30,6 +30,26 @@ var __ = {
 
     newScript.src = url + ((window.location.queryString("cachebuster") !== null) ? "?cachebuster=" + __.rndString(10, ["letters", "numbers"]) : "")
   },
+
+  /*********************************************
+      LOAD STYLE
+      
+      This is used to load css files
+      onto the page.
+  ******************************************** */
+      loadStyle: function(url, cb) {
+        var link = document.createElement("link");
+        link.href = url + ((window.location.queryString("cachebuster") !== null) ? "?cachebuster=" + __.rndString(10, ["letters", "numbers"]) : "")
+        link.rel = "stylesheet";
+        link.setAttribute("injected", true);
+
+        if (cb) {
+          link.onerror = function() { cb(true, null) };
+          link.onload = function() { cb(null, true) };
+        }      
+        document.head.append(link);
+    
+      },
 
   /*********************************************
       GET CONTENT
