@@ -1,4 +1,4 @@
-/*v012023.3*/
+/*v012023.4*/
 
 var __ = {
   config: {},
@@ -244,33 +244,32 @@ var __ = {
   /*********************************************
       LOAD COMPONENT
   ******************************************** */
-  loadComponent: function(component, params, cb) {
+  loadComponent: function(componentPath, domId, params, cb) {
     var that = this;
-    var componentId = ((typeof component === "string") ? component : component[0]);
+    var componentId = componentPath.replace(/\//g,"_").toLowerCase();
 
-    this.components[componentId] = { "data": params };
-    this.getContent(((typeof __.config !== "undefined" && typeof __.config.origin !== "undefined") ? __.config.origin : window.location.origin) + "/components/" + componentId.toLowerCase() + "/ui" + ((__.config.use_min) ? __.config.use_min : "") + ".html", function(html) {
+    this.components[componentId] = { "params": params };
+    this.getContent(((typeof __.config !== "undefined" && typeof __.config.origin !== "undefined") ? __.config.origin : window.location.origin) + "/components/" + componentPath.toLowerCase() + "/ui" + ((__.config.use_min) ? __.config.use_min : "") + ".html", function(html) {
 
-      if (document.getElementById(componentId + "ComponentHolder")) {
-        document.getElementById(componentId + "ComponentHolder").innerHTML = html;
-      } else if (document.getElementById(component[1] + "ComponentHolder")) {
-        document.getElementById(component[1] + "ComponentHolder").innerHTML = html;
+      if (document.getElementById(domId)) {
+        document.getElementById(domId).innerHTML = html;
+        that.getScript(((typeof __.config !== "undefined" && typeof __.config.origin !== "undefined") ? __.config.origin : window.location.origin) + "/components/" + componentPath.toLowerCase() + "/logic" + ((__.config.use_min) ? __.config.use_min : "") + ".js", function() {
+          if (cb) {
+            if (cb && typeof __.components[componentId.toLowerCase()].js !== "undefined" && typeof __.components[componentId.toLowerCase()].js.callback !== "undefined") {
+              __.components[componentId.toLowerCase()].js.callback = cb;
+            } else if(cb){
+              cb();
+            }
+            if (typeof __.components[componentId.toLowerCase()].js.onLoad !== "undefined") {
+              __.components[componentId.toLowerCase()].js.onLoad();
+            }
+          }
+        });
       } else {
-        document.getElementById(((typeof __.config.screenDOMId !== "undefined") ? __.config.screenDOMId : "screen")).innerHTML = document.getElementById(((typeof __.config.screenDOMId !== "undefined") ? __.config.screenDOMId : "screen")).innerHTML + html;
+        console.error("DOM Element Does Not Exist", domId);
       }
 
-      that.getScript(((typeof __.config !== "undefined" && typeof __.config.origin !== "undefined") ? __.config.origin : window.location.origin) + "/components/" + componentId.toLowerCase() + "/logic" + ((__.config.use_min) ? __.config.use_min : "") + ".js", function() {
-        if (cb) {
-          if (typeof __.components[componentId.toLowerCase()].js !== "undefined" && typeof __.components[componentId.toLowerCase()].js.callback !== "undefined") {
-            __.components[componentId.toLowerCase()].js.callback = cb;
-          } else {
-            cb();
-          }
-          if (typeof __.components[componentId.toLowerCase()].js.onLoad !== "undefined") {
-            __.components[componentId.toLowerCase()].js.onLoad();
-          }
-        }
-      });
+      
     });
   },
 
