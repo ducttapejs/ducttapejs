@@ -1,4 +1,4 @@
-/*v012023.5*/
+/*v012023.6*/
 
 var __ = {
   config: {},
@@ -167,12 +167,12 @@ var __ = {
     var allRoutes = __.routes.slice();
     var location = ((window.location.pathname[[window.location.pathname.length - 1]] === "/") ? window.location.pathname.substr(0, window.location.pathname.length - 1) : window.location.pathname);
 
-    function processRoute() {
+    function processRoute(parameters = {}) {
       if (allRoutes.length > 0) {
         var route = allRoutes.shift();
         var routeRegex = "^";
         var routeParts = route[0].substr(1).split("/");
-        var parameters = {};
+        //var parameters = {};
 
         routeParts.forEach(function(p, i) {
           if (p.indexOf(":") === 0) {
@@ -192,10 +192,10 @@ var __ = {
           if (silent) {
             __.params = parameters;
           } else {
-            route[1](parameters, function() { processRoute(); });
+            route[1](parameters, function(parameters) { processRoute(parameters); });
           }
         } else {
-          processRoute();
+          processRoute(parameters);
         }
 
       }
